@@ -40,4 +40,4 @@ captures/
 *.jks
 
 # Node modules
-database/node_modules
+webservice/node_modules
