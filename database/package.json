@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "mysql": "^2.11.1"
+    "express": "^4.14.0",
+    "node.js": "0.0.0",
+    "pg": "^6.1.0"
   },
   "devDependencies": {},
   "scripts": {
