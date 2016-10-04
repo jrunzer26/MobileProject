@@ -18,12 +18,13 @@ router.get('/', function(req, res, next) {
   db.any("SELECT * FROM Users")
     .then(function (data) {
       console.log(data);
+      res.json(data);
       
     })
     .catch(function (err) {
       console.log(err);
     });
-    res.render('index', { title: 'hello' });
+    //res.render('index', { title: 'hello' });
   
 });
 
