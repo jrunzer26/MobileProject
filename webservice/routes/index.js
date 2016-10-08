@@ -28,6 +28,7 @@ router.get('/', function(req, res, next) {
 router.post('/login', function(req, res, next) {
   req.checkBody('username', 'Username is missing').notEmpty();
   req.checkBody('password', 'Password is missing').notEmpty();
+  console.log(req.body);
   
   var errors = req.validationErrors();
 
