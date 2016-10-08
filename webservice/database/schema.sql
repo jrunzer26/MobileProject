@@ -1,9 +1,9 @@
 CREATE TABLE Users (
     username varchar(255) NOT NULL PRIMARY KEY,
-    gold int,
-    food int,
-    wood int,
-    tiles int
+    password varchar(255) NOT NULL,
+    gold int DEFAULT 0,
+    food int DEFAULT 0,
+    tiles int DEFAULT 0
 );
 
 CREATE TABLE Tiles (

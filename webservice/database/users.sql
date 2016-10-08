@@ -1,8 +1,5 @@
-INSERT INTO users
+INSERT INTO users (Username, password)
 VALUES (
     'Jason',
-    20,
-    45,
-    10,
-    3
+    'mypassword'
 );
