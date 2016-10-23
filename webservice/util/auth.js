@@ -6,6 +6,7 @@ var db = pgp("postgres://jason:mobile@localhost:5432/mobile");
 
 
 exports.authenticate = function () {
+  console.log("auth");
   return function(req, res, next) {
     var credentials = basicAuth(req);
     if (!credentials) {
@@ -13,14 +14,12 @@ exports.authenticate = function () {
     }
     var username = credentials.name;
     var password = credentials.pass;
-    console.log(username + " " + password);
     db.one("SELECT username, password " +
          "FROM Users                " +
          "WHERE username = $1;",
          [username])
     .then(function(data) {
     if(data.username == undefined) {
-      console.log("undefined");
       return res.status(400).json({"err": "Username or password is incorrect."})
     }
     //username exists, check password
@@ -29,12 +28,13 @@ exports.authenticate = function () {
       if (result == false) {
         return res.status(400).json({"err": "Username or password is incorrect."});
       }
+      next();
       });
     })
     .catch(function(err) {
       return res.status(400).json({"err": "Username or password is incorrect."});
     });
-    console.log("hello");
-    next();
+
   }
+  
 }
