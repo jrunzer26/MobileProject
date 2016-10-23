@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var pgp = require('pg-promise')();
 var bcrypt = require('bcrypt');
+var auth = require('../util/auth.js');
 const saltRounds = 10;
 const usernameMinLength = 5;
 const usernameMaxLength = 16;
@@ -25,37 +26,9 @@ router.get('/', function(req, res, next) {
 });
 
 /* POST login {"username":"user","password": "password"} */
-router.post('/login', function(req, res, next) {
-  req.checkBody('username', 'Username is missing').notEmpty();
-  req.checkBody('password', 'Password is missing').notEmpty();
-  console.log(req.body);
-  
-  var errors = req.validationErrors();
-
-  if (errors) {
-    return res.status(400).json({errors: errors});
-  }
-  db.one("SELECT username, password " +
-         "FROM Users                " +
-         "WHERE username = $1;",
-         [req.body.username])
-  .then(function(data) {
-    if(data.username == undefined) {
-      return res.status(400).json({"err": "Username or password is incorrect."});
-    }
-    //username exists, check password
-    bcrypt.compare(req.body.password, data.password, function(err, result) {
-      if (err) {return res.status(409).json({"err": err})}
-      if (result == true) {
-        return res.status(200).json({"logged in: ": "true"});
-      } else {
-        return res.status(400).json({"err": "Username or password is incorrect."});
-      }
-    });
-  })
-  .catch(function(err) {
-    return res.status(400).json({"err": "Username or password is incorrect."});
-  });
+router.post('/login', auth.authenticate(), function(req, res, next) {
+  console.log("login");
+  return res.status(200).json({"logged in: ": "true"});
 });
 
 

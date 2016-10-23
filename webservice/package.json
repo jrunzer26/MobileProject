@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "basic-auth": "^1.0.4",
     "bcrypt": "^0.8.7",
     "body-parser": "^1.15.2",
     "cookie-parser": "~1.4.3",
@@ -18,5 +19,8 @@
     "pg-promise": "^5.3.4",
     "serve-favicon": "~2.3.0",
     "supertest": "^2.0.0"
+  },
+  "devDependencies": {
+    "basic-auth": "^1.0.4"
   }
 }
