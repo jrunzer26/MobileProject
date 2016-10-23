@@ -6,8 +6,6 @@ var pgp = require('pg-promise')();
 var db = pgp("postgres://jason:mobile@localhost:5432/mobile");
 /* GET users listing. */
 router.get('/', auth.authenticate(), function(req, res, next) {
-  var err = '';
-  //console.log(req.body.username + " " + req.body.password);
   res.status(200).json({"hello": err});
 });
 
