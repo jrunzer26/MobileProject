@@ -27,7 +27,6 @@ router.get('/', function(req, res, next) {
 
 /* POST login {"username":"user","password": "password"} */
 router.post('/login', auth.authenticate(), function(req, res, next) {
-  console.log("login");
   return res.status(200).json({"logged in: ": "true"});
 });
 
@@ -40,16 +39,16 @@ router.post('/register', function(req, res, next) {
   var errors = req.validationErrors();
 
   if (errors) {
-    return res.status(400).json({errors: errors});
+    return res.status(400).json({"err": "Validation errors"});
   }
 
   if (req.body.username.length < usernameMinLength || req.body.username.length > usernameMaxLength) {
-    return res.status(400).json({"error": "Username must be atleast " + usernameMinLength + 
+    return res.status(400).json({"err": "Username must be atleast " + usernameMinLength + 
       " characters long and a maximum of " + usernameMaxLength + " characters"});
   }
 
   if (req.body.password.length < passwordMinLength || req.body.password.length > passwordMaxLength) {
-    return res.status(400).json({"error": "Password must be atleast " + passwordMinLength + 
+    return res.status(400).json({"err": "Password must be atleast " + passwordMinLength + 
       " characters long and a maximum of " + passwordMaxLength + " characters"});
   }
 
@@ -60,7 +59,7 @@ router.post('/register', function(req, res, next) {
          [req.body.username])
   .then(function (data) {
     if (data.length >= 1) {
-      return res.status(409).json({"error": "Username already exists"});
+      return res.status(409).json({"err": "Username already exists"});
     }
     //hash the user's password
     bcrypt.genSalt(saltRounds, function(err, salt) {
