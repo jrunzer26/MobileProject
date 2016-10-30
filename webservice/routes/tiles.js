@@ -1,28 +1,33 @@
 var express = require('express');
 var router = express.Router();
 var auth = require('../util/auth.js');
+var tileCreator = require('../util/tileCreator.js')
 var pgp = require('pg-promise')();
 
 var db = pgp("postgres://jason:mobile@localhost:5432/mobile");
-/* POST get users stats. 
-	{"username":"username"*/
-router.post('/', auth.authenticate(), function(req, res, next) {
-  db.any('SELECT "gold", "food", "tiles",            ' + 
-        '"tilesTaken", "goldObtained", "foodObtained"' +
-         "FROM Users                                 " +
-         "WHERE username = $1;                       ",
-         [req.body.username])
+/* POST get a tile's resources
+	{"tileID":"tileid", "username": "username"}*/
+router.post('/resources', auth.authenticate(), function(req, res, next) {
+  db.any('SELECT "gold", "food"' + 
+         "FROM Tiles           " +
+         'WHERE "tileID" = $1; ',
+         [req.body.tileID])
   .then(function (data) {
     if (data.length < 1) {
-      return res.status(409).json({"err": "Username does not exist"});
+      var goldGen = Math.floor(Math.random() * 5);
+      var foodGen = Math.floor(Math.random() * 5);
+      db.none('INSERT INTO Tiles ("tileID", "gold", "food", "username")' +
+        "VALUES ($1,$2,$3,$4);",
+        [req.body.tileID, goldGen, foodGen, req.body.username])
+      .then(function () {
+        return res.status(200).json({"gold": goldGen, "food": foodGen});
+      })
+      .catch(function(err) {
+        return res.status(409).json({"error": err});
+      });
+    } else {
+      return res.status(200).json({"gold": data[0].gold, "food": data[0].food});
     }
-    return res.status(200).json({"gold": data[0].gold,
-      "food": data[0].food,
-      "tiles": data[0].tiles,
-      "tilesTaken": data[0].tilesTaken,
-      "goldObtained": data[0].goldObtained,
-      "foodObtained": data[0].foodObtained,
-    });
   })
   .catch(function (err) {
     console.log(err);

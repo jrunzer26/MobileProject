@@ -10,12 +10,10 @@ CREATE TABLE Users (
 );
 
 CREATE TABLE Tiles (
-    tileID int NOT NULL PRIMARY KEY,
-    latitude float(24),
-    longitude float(24),
-    username varchar(255),
-    gold int NOT NULL,
-    food int NOT NULL,
+    "tileID" int NOT NULL PRIMARY KEY,
+    "username" varchar(255),
+    "gold" int NOT NULL,
+    "food" int NOT NULL,
     FOREIGN KEY(username) REFERENCES Users(username)
 );
 
