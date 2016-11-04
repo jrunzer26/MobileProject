@@ -32,7 +32,7 @@ router.post('/', auth.authenticate(), function(req, res, next) {
 
 /* POST Add resources to user */
 router.post('/add', auth.authenticate(), function(req, res, next) {
-  db.none('UPDATE Users ' +
+  db.none('UPDATE Users                          ' +
          'SET "gold" = "gold" + $1,              ' +
          '  "food" = "food" + $2,                ' +
          '  "goldObtained" = "goldObtained" + $1,' +
