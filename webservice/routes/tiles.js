@@ -1,14 +1,21 @@
 var express = require('express');
 var router = express.Router();
 var auth = require('../util/auth.js');
+var async = require('async');
+var Pomise = require('promise');
+var tileCreator = require('../util/tileCreator.js');
 
 var pgp = require('pg-promise')();
 
 var db = pgp("postgres://jason:mobile@localhost:5432/mobile");
 
+var finishTiles = function (tileInfo, res) {
+  console.log("end function");
+  return res.status(200).json(tileInfo);
+}
 
 /* POST get a tile's resources, creates a tile if it doesn't exist
-	{"tileID":"tileid", "username": "username"}*/
+	{"tileID":"tileid"}*/
 router.post('/resources', auth.authenticate(), function(req, res, next) {
   db.any('SELECT "gold", "food", "username"' + 
          "FROM Tiles           " +
@@ -22,14 +29,14 @@ router.post('/resources', auth.authenticate(), function(req, res, next) {
         "VALUES ($1,$2,$3);",
         [req.body.tileID, goldGen, foodGen])
       .then(function () {
-        return res.status(200).json({"gold": goldGen, "food": foodGen, "username": "null"});
+        return res.status(200).json({"tileID": req.body.tileID, "gold": goldGen, "food": foodGen, "username": "null"});
       })
       .catch(function(err) {
         console.log(err);
         return res.status(409).json({"err": "there was an internal error with resources"});
       });
     } else {
-      return res.status(200).json({"gold": data[0].gold, "food": data[0].food, "username": data[0].username});
+      return res.status(200).json({"tileID": req.body.tileID, "gold": data[0].gold, "food": data[0].food, "username": data[0].username});
     }
   })
   .catch(function (err) {
@@ -66,5 +73,28 @@ router.post('/capture', auth.authenticate(), function(req, res, next) {
     return res.status(409).json({"err": "error capturing tile"})
   });
 });
+
+
+
+
+
+/* POST get resouces of multiple tiles */
+/*  {
+  "tiles": [{
+    "tileID": "tileID",
+    "username": "username"
+  }, {
+    "tileID": "tileID",
+    "username": "username"
+  }]
+}
+*/
+router.post('/multi-resources', auth.authenticate(), tileCreator.tileArrayGetter(),  function(req, res, next) {
+  console.log("in multi resources");
+  console.log(res.locals.tiles);
+  return res.status(200).json(res.locals.tiles);
+});
+
+
 
 module.exports = router;
