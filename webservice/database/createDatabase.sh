@@ -1,4 +1,5 @@
 echo "DROP DATABASE IF EXISTS mobile;" | psql
 echo "CREATE DATABASE mobile;" | psql 
-psql mobile < schema.sql
-psql mobile < users.sql
+echo "psql mobile < schema.sql"
+psql mobile < users-schema.sql
+psql mobile < tiles-schema.sql
