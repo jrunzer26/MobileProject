@@ -26,43 +26,19 @@ exports.createTile = function (tileID, username) {
 	
 
 }
-var tilePush = function(tile, tileInfo) {
-  console.log(tile);
-    console.log(tile.tileID);
-    console.log("tile info" + tileInfo);
-    db.any('SELECT "gold", "food", "username"' + 
-         "FROM Tiles           " +
-         'WHERE "tileID" = $1; ',
-         [tile.tileID])
-    .then(function (data) {
-      if (data.length < 1) {
-        var goldGen = Math.floor(Math.random() * 5);
-        var foodGen = Math.floor(Math.random() * 5);
-        db.none('INSERT INTO Tiles ("tileID", "gold", "food")' +
-          "VALUES ($1,$2,$3);",
-          [tile.tileID, goldGen, foodGen])
-        .then(function () {
-          tileInfo.tiles.push({"gold": goldGen, "food": foodGen, "username": "null"});
-          console.log(tileInfo);
-        })
-        .catch(function(err) {
-          console.log(err);
-          return res.status(409).json({"err": "there was an internal error with resources"});
-        });
-      } else {
-        tileInfo.tiles.push({"gold": data[0].gold, "food": data[0].food, "username": data[0].username});
-        //console.log(tileInfo);
-      }
-      console.log("testing");
-    })
-    .catch(function (err) {
-      console.log(err);
-      return res.status(409).json({"err": "error getting tile resources"});
-    });
-    //console.log(tileInfo);
-    console.log("end of for loop")
-}
 
+
+/*  {
+  "username": "username",
+  "tiles": [{
+    "tileLatID": "tileLatID",
+    "tileLngID": "tileLatID",
+  }, {
+    "tileLatID": "tileLatID",
+    "tileLngID": "tileLatID",
+  }]
+}
+*/
 exports.tileArrayGetter = function() {
 	console.log("in array getter");
 
@@ -73,52 +49,43 @@ exports.tileArrayGetter = function() {
 		console.log(req.body.tiles.length);
 		for(var i = 0; i < req.body.tiles.length; i++) {
 			var reqTile = req.body.tiles[i];
-			console.log("tile id: " + reqTile.tileID);
-			tiles.tiles.push({id: reqTile.tileID});
+			console.log(reqTile);
 			db.any('SELECT "gold", "food", "username"' + 
 		         "FROM Tiles           " +
-		         'WHERE "tileID" = $1; ',
-		         [reqTile.tileID])
+		         'WHERE "tileLatID" = $1 AND "tileLngID" = $2;',
+		         [reqTile.tileLatID, reqTile.tileLngID])
 		    .then(function (data) {
 		      if (data.length < 1) {
+		      	console.log("creating new tile");
+		      	console.log(reqTile.tileLatID + " " + reqTile.tileLngID);
 		        var goldGen = Math.floor(Math.random() * 5);
 		        var foodGen = Math.floor(Math.random() * 5);
-		        db.none('INSERT INTO Tiles ("tileID", "gold", "food")' +
-		          "VALUES ($1,$2,$3);",
-		          [reqTile.tileID, goldGen, foodGen])
+		        db.none('INSERT INTO Tiles ("tileLatID", "tileLngID", "gold", "food")' +
+		          "VALUES ($1,$2,$3,$4);",
+		          [reqTile.tileLatID, reqTile.tileLngID, goldGen, foodGen])
 		        .then(function () {
-		          tiles.tiles.push({"id": reqTile.tileID, "gold": goldGen, "food": foodGen, "username": "null"});
+		          tiles.tiles.push({"tileLatID": reqTile.tileLatID, "tileLngID": reqTile.tileLngID, 
+		          	"gold": goldGen, "food": foodGen, "username": "null"});
 		          console.log(tiles);
-		          if (i + 1 == req.body.tiles.length) {
-			    	res.locals.tiles = tiles;
-			    	next();
-		      	  }
 		        })
 		        .catch(function(err) {
 		          console.log(err);
 		        });
 		      } else {
-		        tiles.tiles.push({"id": reqTile.tileID, "gold": data[0].gold, "food": data[0].food, "username": data[0].username});
+		        tiles.tiles.push({"tileLatID": reqTile.tileLatID, "tileLngID": reqTile.tileLngID, "gold": data[0].gold, "food": data[0].food, "username": data[0].username});
 		        console.log(tiles);
-		        if (i + 1 == req.body.tiles.length) {
-			    	res.locals.tiles = tiles;
-			    	next();
-		      	}
 		      }
 		      console.log("testing");
-		      if (i + 1 == req.body.tiles.length) {
-		    	res.locals.tiles = tiles;
-		    	next();
-		      }
 		    })
 		    .catch(function (err) {
 		      console.log(err);
 		      return res.status(409).json({"err": "error getting tile resources"});
 		    });
-		    //console.log(tileInfo);
 		    console.log("end of for loop")
-		    tiles.tiles.push({id: 5});
-		    
+		    if (i +1 == req.body.tiles.length) {
+		    	res.locals.tiles = tiles;
+		    	next();
+		    }
 		}
 	}
 }

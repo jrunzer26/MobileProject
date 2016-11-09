@@ -10,7 +10,9 @@ CREATE TABLE Users (
 );
 
 CREATE TABLE Tiles (
-    "tileID" int NOT NULL PRIMARY KEY,
+    "tileID" SERIAL PRIMARY KEY,
+    "tileLatID" int NOT NULL,
+    "tileLngID" int NOT NULL,
     "username" varchar(255),
     "gold" int NOT NULL,
     "food" int NOT NULL,
