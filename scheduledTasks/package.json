@@ -1,0 +1,17 @@
+{
+  "name": "scheduled-updater",
+  "version": "1.0.0",
+  "description": "Updates the users resources based on the tile information",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-schedule": "^1.2.0",
+    "pg": "^6.1.0",
+    "pg-promise": "^5.3.4",
+    "promise": "^7.1.1"
+  }
+}
