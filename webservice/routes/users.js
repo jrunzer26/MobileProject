@@ -8,7 +8,8 @@ var db = pgp("postgres://jason:mobile@localhost:5432/mobile");
 	{"username":"username"*/
 router.post('/', auth.authenticate(), function(req, res, next) {
   db.any('SELECT "gold", "food", "tiles",            ' + 
-        '"tilesTaken", "goldObtained", "foodObtained"' +
+        '"tilesTaken", "goldObtained", "foodObtained", ' +
+        '"totalGoldObtained", "totalFoodObtained" ' +
          "FROM Users                                 " +
          "WHERE username = $1;                       ",
          [req.body.username])
@@ -75,7 +76,7 @@ router.post('/collect', auth.authenticate(), function(req, res, next) {
     .catch(function(error) {
       console.log(error);
     });
-    res.status(200).json({goldObtained: data[0].goldObtained, foodObtained: data[0].foodObtained});
+    return res.status(200).json({goldObtained: data[0].goldObtained, foodObtained: data[0].foodObtained});
   })
   .catch(function(err) {
     console.log(err);

@@ -63,28 +63,57 @@ router.post('/resources', auth.authenticate(), function(req, res, next) {
 */
 router.post('/capture', auth.authenticate(), function(req, res, next) {
   console.log(req.body.username + " " + req.body.tileLatID);
-  db.none('UPDATE Tiles                         ' +
-         'SET "username" = $1              ' +
-         'WHERE "tileLatID" = $2 AND "tileLngID" = $3;',
-        [req.body.username, req.body.tileLatID, req.body.tileLngID])
-  .then(function (data) {
-    //get the resources
-    db.any('SELECT "gold", "food", "username"' + 
-         "FROM Tiles           " +
+
+  db.any('SELECT "username" ' +
+         'FROM Tiles ' +
          'WHERE "tileLatID" = $1 AND "tileLngID" = $2;',
          [req.body.tileLatID, req.body.tileLngID])
-    .then(function(tileData) {
-      return res.status(409).json({"tileLatID": req.body.tileLatID, "tileLngID": req.body.tileLngID, "gold": tileData[0].gold, "food": tileData[0].food, "username": tileData[0].username});
-    })
-    .catch(function (err) {
-      console.log(err);
-      return res.status(409).json({"err": "error getting tile resources"});
+  .then(function(usernameData) {
+    console.log("username data: " + usernameData[0].username);
+    if(usernameData[0].username != null) {
+      console.log("in not null");
+       db.none('UPDATE Users ' +
+           'SET "tiles" = "tiles" - 1 ' +
+           'WHERE "username" = $1',
+           [usernameData[0].username])
+      .catch(function(err) {
+        console.log("error subtracting tiles: " + err);
+      });
+    }
+    db.none('UPDATE Users ' +
+           'SET "tiles" = "tiles" + 1, ' +
+           '"tilesTaken" = "tilesTaken" + 1 ' +
+           'WHERE "username" = $1',
+           [req.body.username])
+    .catch(function(err) {
+      console.log("error updating user tile: " + err);
     });
-  })
-  .catch(function(err) {
-    console.log(err);
-    return res.status(409).json({"err": "error capturing tile"})
-  });
+    db.none('UPDATE Tiles                         ' +
+           'SET "username" = $1              ' +
+           'WHERE "tileLatID" = $2 AND "tileLngID" = $3;',
+          [req.body.username, req.body.tileLatID, req.body.tileLngID])
+    .then(function (data) {
+      //get the resources
+      db.any('SELECT "gold", "food", "username"' + 
+           "FROM Tiles           " +
+           'WHERE "tileLatID" = $1 AND "tileLngID" = $2;',
+           [req.body.tileLatID, req.body.tileLngID])
+      .then(function(tileData) {
+        return res.status(200).json({"tileLatID": req.body.tileLatID, "tileLngID": req.body.tileLngID, "gold": tileData[0].gold, "food": tileData[0].food, "username": tileData[0].username});
+      })
+      .catch(function (err) {
+        console.log(err);
+        return res.status(409).json({"err": "error getting tile resources"});
+      });
+    })
+    .catch(function(err) {
+      console.log(err);
+      return res.status(409).json({"err": "error capturing tile"})
+    });
+    })
+    .catch(function(error) {
+      console.log("error getting username" + error);
+    });
 });
 
 

@@ -30,13 +30,15 @@ var j = schedule.scheduleJob(rule, function() {
 				for(var j = 0; j < tileData.length; j++) {
 					console.log(tileData[j]);
 					console.log("username: " + username);
-					db.none('UPDATE Users ' +
-						'SET "goldObtained" = "goldObtained" + $1, ' +
-						'"foodObtained" = "foodObtained" + $2, ' +
-						'"totalGoldObtained" = "totalGoldObtained" + $1, ' +
-						'"totalFoodObtained" = "totalFoodObtained" + $2 ' +
-						'WHERE "username" = $3;',
-						[tileData[j].gold, tileData[j].food, username])
+					db.none('UPDATE Users                                    ' +
+							'SET "goldObtained" = "goldObtained" + $1,       ' +
+							'"foodObtained" = "foodObtained" + $2,           ' +
+							'"totalGoldObtained" = "totalGoldObtained" + $1, ' +
+							'"totalFoodObtained" = "totalFoodObtained" + $2, ' +
+							'"gold" = "gold" + $1,                           ' +
+							'"food" = "food" + $2                            ' +
+							'WHERE "username" = $3;                          ',
+							[tileData[j].gold, tileData[j].food, username])
 					.catch(function(someError) {
 						console.log(someError);
 					});
