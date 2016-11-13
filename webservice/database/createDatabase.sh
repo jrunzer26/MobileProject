@@ -3,3 +3,4 @@ echo "CREATE DATABASE mobile;" | psql
 echo "psql mobile < schema.sql"
 psql mobile < users-schema.sql
 psql mobile < tiles-schema.sql
+psql mobile < users.sql

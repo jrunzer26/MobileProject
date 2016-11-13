@@ -7,5 +7,9 @@ CREATE TABLE Users (
     "tiles" int DEFAULT 0,
     "tilesTaken" int DEFAULT 0,
     "goldObtained" int DEFAULT 0,
-    "foodObtained" int DEFAULT 0
+    "foodObtained" int DEFAULT 0,
+    "totalGoldObtained" int DEFAULT 0,
+    "totalFoodObtained" int DEFAULT 0,
+    "totalSoldiers" int DEFAULT 0,
+    "soldiersAvailable" int DEFAULT 0
 );

@@ -42,3 +42,4 @@ captures/
 
 # Node modules
 webservice/node_modules
+scheduledTasks/node_modules
