@@ -6,5 +6,6 @@ CREATE TABLE Tiles (
     "username" varchar(255),
     "gold" int NOT NULL,
     "food" int NOT NULL,
+    "soldiers" int NOT NULL,
     FOREIGN KEY(username) REFERENCES Users(username)
 );
