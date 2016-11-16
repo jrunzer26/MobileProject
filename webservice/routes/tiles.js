@@ -195,8 +195,9 @@ router.post('/purchace-soldiers', auth.authenticate(), function(req, res, next) 
   // send back the updated tile.
 
 /* POST remove some soldiers for a tile */
-/* {"username": username, "soldiers": 5}*/
-router.post('/remove-soldiers', auth.authenticate(), function(req, res, next) {
+/* Tile 1 is the uesr's tile, tile 2 is the tile to attack" */
+/* {"username": username, "tileLatID1": tileLatID1, "tileLngID1": tileLngId1, "tileLatID2": tileLatID2, "tileLngID2": tileLngID2}*/
+router.post('/battle', auth.authenticate(), function(req, res, next) {
 
 });
 
