@@ -3,7 +3,7 @@ var db = pgp("postgres://jason:mobile@localhost:5432/mobile");
 var schedule = require('node-schedule');
 
 var rule = new schedule.RecurrenceRule();
-rule.second = 0;
+rule.minute = 0;
 
 
 
