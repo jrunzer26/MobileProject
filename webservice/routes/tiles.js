@@ -253,7 +253,7 @@ router.post('/battle', auth.authenticate(), function(req, res, next) {
               'WHERE "tileLatID" = $2 AND "tileLngID" = $3;',
               [tile2Username, tile2.tileLatID, tile2.tileLngID])
             .then(function() {
-              db.any('SELECT "gold", "food", "username", "soldiers" ' + 
+              db.any('SELECT "gold", "food", "username", "soldiers", "tileLatID", "tileLngID" ' + 
                    "FROM Tiles           " +
                    'WHERE ("tileLatID" = $1 AND "tileLngID" = $2 ) OR ("tileLatID" = $3 AND "tileLngID" = $4);',
                    [req.body.tileLatID1, req.body.tileLngID1, req.body.tileLatID2, req.body.tileLngID2]
