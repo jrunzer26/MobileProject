@@ -65,9 +65,9 @@ router.post('/register', function(req, res, next) {
     bcrypt.genSalt(saltRounds, function(err, salt) {
       bcrypt.hash(req.body.password, salt, function (err, hash) {
         if (err) { return res.status(409).json({"error": err}); }
-        db.none("INSERT INTO Users (Username, password)" + 
-                " VALUES ($1, $2);                     ",
-                [req.body.username, hash])
+        db.none("INSERT INTO Users (Username, password, gold, food)" + 
+                " VALUES ($1, $2, $3, $4);                     ",
+                [req.body.username, hash, 50, 50])
         .then(function () {
           return res.sendStatus(200);
         })

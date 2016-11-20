@@ -198,8 +198,107 @@ router.post('/purchace-soldiers', auth.authenticate(), function(req, res, next) 
 /* Tile 1 is the uesr's tile, tile 2 is the tile to attack" */
 /* {"username": username, "tileLatID1": tileLatID1, "tileLngID1": tileLngId1, "tileLatID2": tileLatID2, "tileLngID2": tileLngID2}*/
 router.post('/battle', auth.authenticate(), function(req, res, next) {
-
+  // get tile information with soldiers, id's and username
+  db.any('SELECT "gold", "food", "username", "soldiers", "tileLatID", "tileLngID" ' + 
+         "FROM Tiles           " +
+         'WHERE ("tileLatID" = $1 AND "tileLngID" = $2) OR ("tileLatID" = $3 AND "tileLngID" = $4);',
+         [req.body.tileLatID1, req.body.tileLngID1, req.body.tileLatID2, req.body.tileLngID2])
+    .then(function (data) {
+      console.log('tile2: ' + req.body.tileLngID2 + 'tile2: ' + req.body.tileLatID2);
+      var tile1;
+      var tile2;
+      var win;
+      var food;
+      var subtractSoldiers;
+      var subtractedFood;
+      var tile2Username;
+      console.log(data);
+      if (data[0].username == req.body.username) {
+        tile1 = data[0];
+        tile2 = data[1];
+        console.log(tile2.username);
+      } else {
+        tile1 = data[1];
+        tile2 = data[0];
+      }
+      tile2Username = tile2.username;
+      var soldierDiff = tile1.soldiers - tile2.soldiers;
+      if (soldierDiff > 0) {
+        win = true;
+        subtractSoldiers = tile2.soldiers;
+        tile2Username = null;
+      } else {
+        subtractSoldiers = tile1.soldiers;
+        win = false;
+      }
+      subtractedFood = subtractSoldiers * 10;
+      console.log("win: " + win);
+      console.log(tile1.username + " " + tile2.username);
+      db.none('UPDATE Tiles                         ' +
+         'SET "soldiers" = "soldiers" - $1              ' +
+         'WHERE ("tileLatID" = $2 AND "tileLngID" = $3) OR ("tileLatID" = $4 AND "tileLngID" = $5);',
+        [subtractSoldiers, req.body.tileLatID1, req.body.tileLngID1, req.body.tileLatID2, req.body.tileLngID2])
+      .then(function() {
+          db.none('UPDATE Users ' +
+            'SET "totalSoldiers" = "totalSoldiers" - $1 ' +
+            'WHERE ("username" = $2 OR "username" = $3);',
+            [subtractSoldiers, tile2.username, tile1.username])
+          .then(function() {
+             db.none('UPDATE Users ' +
+              'SET "food" = "food" - $2 ' +
+              'WHERE ("username" = $3);',
+              [subtractSoldiers, subtractedFood, tile1.username])
+            db.none('UPDATE Tiles ' + 
+              'SET "username" = $1 ' +
+              'WHERE "tileLatID" = $2 AND "tileLngID" = $3;',
+              [tile2Username, tile2.tileLatID, tile2.tileLngID])
+            .then(function() {
+              db.any('SELECT "gold", "food", "username", "soldiers" ' + 
+                   "FROM Tiles           " +
+                   'WHERE ("tileLatID" = $1 AND "tileLngID" = $2 ) OR ("tileLatID" = $3 AND "tileLngID" = $4);',
+                   [req.body.tileLatID1, req.body.tileLngID1, req.body.tileLatID2, req.body.tileLngID2]
+                )
+              .then(function(data) {
+                if (data.length > 1) {
+                    var tile1;
+                    var tile2;
+                    var win;
+                    if (data[0].username == req.body.username) {
+                      tile1 = data[0];
+                      tile2 = data[1];
+                    } else {
+                      tile1 = data[1];
+                      tile2 = data[0];
+                    }
+                     db.any('SELECT "food" ' +
+                            'FROM Users ' +
+                            'WHERE "username" = $1;',
+                            [req.body.username])
+                     .then(function(foodData) {
+                      console.log(foodData);
+                      return res.status(200).json({"food": foodData[0].food, tiles: [tile1, tile2]});
+                     });
+                  }
+              })
+              .catch(function(err) {
+                console.log(err);
+              });
+          })
+          .catch(function(err) {
+            console.log("another error: " + err);
+          });
+      })
+      .catch(function(err) {
+          console.log("some error : " + err);
+      });
+    });
+  })
+    .catch(function(err) { 
+      console.log(err);
+    });
 });
+
+
 
 
 
