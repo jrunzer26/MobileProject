@@ -123,12 +123,12 @@ router.post('/purchace-soldiers', auth.authenticate(), function(req, res, next) 
   // check if the user is the owner of the tile
   var requestedSoldiers = req.body.soldiers;
   console.log(requestedSoldiers);
+  console.log(req.body.username);
   db.any('SELECT "username" ' +
          'FROM Tiles ' +
          'WHERE "tileLatID" = $1 AND "tileLngID" = $2 AND "username" = $3;',
          [req.body.tileLatID, req.body.tileLngID, req.body.username])
   .then(function(usernameData) {
-    console.log("username data: " + usernameData[0].username);
     if(usernameData.length > 0) {
       db.any('SELECT "gold" ' +
         'FROM Users ' +
@@ -140,7 +140,7 @@ router.post('/purchace-soldiers', auth.authenticate(), function(req, res, next) 
           console.log("cost: " + cost);
           var subtractedGold = goldData[0].gold - cost;
           console.log("subtracted gold: " + subtractedGold);
-          if (subtractedGold > 0) {
+          if (subtractedGold >= 0) {
             db.none('UPDATE Users ' +
               'SET "totalSoldiers" = "totalSoldiers" + $1, ' +
               '"gold" = $2 ' +
@@ -247,7 +247,12 @@ router.post('/battle', auth.authenticate(), function(req, res, next) {
              db.none('UPDATE Users ' +
               'SET "food" = "food" - $2 ' +
               'WHERE ("username" = $3);',
-              [subtractSoldiers, subtractedFood, tile1.username])
+              [subtractSoldiers, subtractedFood, tile1.username]);
+             db.none('UPDATE Users ' + 
+                'SET "tiles" = "tiles" - 1 ' +
+                'WHERE "username" = $1;',
+                [tile2.username]
+              );
             db.none('UPDATE Tiles ' + 
               'SET "username" = $1 ' +
               'WHERE "tileLatID" = $2 AND "tileLngID" = $3;',
